@@ -2,9 +2,10 @@ import logging
 
 
 class JobPostingImportBase(object):
-    def __init__(self, partner_id, s3_conn=None):
+    def __init__(self, partner_id, s3_conn=None, onet_cache=None):
         self.partner_id = partner_id
         self.s3_conn = s3_conn
+        self.onet_cache = onet_cache
 
     def postings(self, quarter):
         logging.info('Finding postings for %s', quarter)
