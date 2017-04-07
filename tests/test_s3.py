@@ -1,5 +1,6 @@
 from moto import mock_s3
 import boto
+import os
 import tempfile
 from skills_utils.s3 import download, upload
 
@@ -35,7 +36,7 @@ def test_upload():
         upload(s3_conn, f.name, s3_path)
         key = boto.s3.key.Key(
             bucket=bucket,
-            name='apath/akey/{}'.format(f.name)
+            name='apath/akey/{}'.format(os.path.basename(f.name))
         )
         s = key.get_contents_as_string()
         assert s.decode('utf-8') == 'test'
