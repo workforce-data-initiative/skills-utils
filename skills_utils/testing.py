@@ -1,3 +1,4 @@
+"""Testing utilities"""
 from skills_utils.job_posting_import import JobPostingImportBase
 
 import unittest
@@ -12,6 +13,7 @@ MANDATORY_FIELDS = [
 
 
 class SampleImporter(JobPostingImportBase):
+    """A basic importer that can be run through the ImporterTest"""
     def _iter_postings(self, quarter):
         pass
 

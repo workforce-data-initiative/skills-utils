@@ -1,3 +1,5 @@
+"""Metta-data (https://github.com/dssg/metta-data) utilities"""
+
 from datetime import date
 from calendar import monthrange
 import metta
@@ -5,6 +7,13 @@ import pandas as pd
 from random import randint
 
 def quarter_boundaries(quarter):
+    """Returns first and last day of a quarter
+
+    Args:
+        quarter (str) quarter, in format '2015Q1'
+
+    Returns: (tuple) datetime.dates for the first and last days of the quarter
+    """
     year, quarter = quarter.split('Q')
     year = int(year)
     quarter = int(quarter)
@@ -16,6 +25,14 @@ def quarter_boundaries(quarter):
 
 
 def metta_config(quarter, num_dimensions):
+    """Returns metta metadata for a quarter's SOC code classifier matrix
+
+    Args:
+        quarter (str) quarter, in format '2015Q1'
+        num_dimensions (int) Number of features in matrix
+
+    Returns: (dict) metadata suitable for metta.archive_train_test
+    """
     first_day, last_day = quarter_boundaries(quarter)
     return {
         'start_time': first_day,
@@ -28,6 +45,17 @@ def metta_config(quarter, num_dimensions):
     }
 
 def upload_to_metta(train_features_path, train_labels_path, test_features_path, test_labels_path, train_quarter, test_quarter, num_dimensions):
+    """Store train and test matrices using metta
+
+    Args:
+        train_features_path (str) Path to matrix with train features
+        train_labels_path (str) Path to matrix with train labels
+        test_features_path (str) Path to matrix with test features
+        test_labels_path (str) Path to matrix with test labels
+        train_quarter (str) Quarter of train matrix
+        test_quarter (str) Quarter of test matrix
+        num_dimensions (int) Number of features
+    """
     train_config = metta_config(train_quarter, num_dimensions)
     test_config = metta_config(test_quarter, num_dimensions)
 
@@ -64,6 +92,3 @@ if __name__ == '__main__':
                     '2011Q1',
                     '2016Q1',
                     500)
-
-
-
