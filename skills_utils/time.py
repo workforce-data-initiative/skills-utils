@@ -1,3 +1,4 @@
+"""Time utilities"""
 from datetime import date
 import math
 

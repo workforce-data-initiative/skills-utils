@@ -1,4 +1,5 @@
 """Filesystem-related utilities"""
+
 from functools import wraps
 import os
 import json
@@ -7,7 +8,13 @@ CACHE_DIRECTORY = 'tmp/'
 
 
 def cache_json(filename):
-    """Caches the json-serializable output of the function to a given file"""
+    """Caches the JSON-serializable output of the function to a given file
+
+    Args:
+        filename (str) The filename (sans directory) to store the output
+
+    Returns: decorator, applicable to a function that produces JSON-serializable output
+    """
     def cache_decorator(cacheable_function):
         @wraps(cacheable_function)
         def cache_wrapper(*args, **kwargs):

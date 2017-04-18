@@ -9,7 +9,7 @@ import os
 def split_s3_path(path):
     """
     Args:
-        path: a string representing an s3 path including a bucket
+        path: (str) an s3 path including a bucket
             (bucket_name/prefix/prefix2)
     Returns:
         A tuple containing the bucket name and full prefix)
@@ -18,12 +18,12 @@ def split_s3_path(path):
 
 
 def upload(s3_conn, filepath, s3_path):
-    """
-    Uploads the given file to s3
+    """Uploads the given file to s3
+
     Args:
-        s3_conn: a boto s3 connection
-        filepath: local filename
-        s3_path: the destination path on s3
+        s3_conn: (boto.s3.connection) an s3 connection
+        filepath (str) the local filename
+        s3_path (str) the destination path on s3
     """
     bucket_name, prefix = split_s3_path(s3_path)
     bucket = s3_conn.get_bucket(bucket_name)
@@ -38,6 +38,13 @@ def upload(s3_conn, filepath, s3_path):
 
 
 def download(s3_conn, out_filename, s3_path):
+    """Downloads the given s3_path
+
+    Args:
+        s3_conn (boto.s3.connection) a boto s3 connection
+        out_filename (str) local filename to save the file
+        s3_path (str) the source path on s3
+    """
     bucket_name, prefix = split_s3_path(s3_path)
     bucket = s3_conn.get_bucket(bucket_name)
     key = boto.s3.key.Key(
@@ -49,4 +56,5 @@ def download(s3_conn, out_filename, s3_path):
 
 
 def log_download_progress(num_bytes, obj_size):
+    """Callback that boto can use to log download or upload progress"""
     logging.info('%s bytes transferred out of %s total', num_bytes, obj_size)
