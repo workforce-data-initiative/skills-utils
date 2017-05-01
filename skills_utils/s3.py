@@ -2,6 +2,7 @@
 Common S3 utilities
 """
 import boto
+import json
 import logging
 import os
 
@@ -35,6 +36,28 @@ def upload(s3_conn, filepath, s3_path):
     )
     logging.info('uploading from %s to %s', filepath, key)
     key.set_contents_from_filename(filepath)
+
+
+def upload_dict(s3_conn, s3_prefix, data_to_sync):
+    """Syncs a dictionary to an S3 bucket, serializing each value in the
+    dictionary as a JSON file with the key as its name.
+
+    Args:
+        s3_conn: (boto.s3.connection) an s3 connection
+        s3_prefix: (str) the destination prefix
+        data_to_sync: (dict)
+    """
+    bucket_name, prefix = split_s3_path(s3_prefix)
+    bucket = s3_conn.get_bucket(bucket_name)
+
+    for key, value in data_to_sync.items():
+        full_name = '{}/{}.json'.format(prefix, key)
+        s3_key = boto.s3.key.Key(
+            bucket=bucket,
+            name=full_name
+        )
+        logging.info('uploading key %s', full_name)
+        s3_key.set_contents_from_string(json.dumps(value))
 
 
 def download(s3_conn, out_filename, s3_path):
