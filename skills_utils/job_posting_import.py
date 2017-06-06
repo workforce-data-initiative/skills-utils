@@ -18,7 +18,14 @@ class JobPostingImportBase(object):
         self.s3_conn = s3_conn
         self.onet_cache = onet_cache
 
-    def postings(self, quarter):
+    def postings(self, quarter, stats_counter=None):
+        """Yield job postings in common schema format
+
+        Args:
+            quarter (str) The quarter, in format '2015Q1'
+            stats_counter (object, optional) A counter that can track both
+                input and output documents using a 'track' method.
+        """
         logging.info('Finding postings for %s', quarter)
         for posting in self._iter_postings(quarter):
             transformed = self._transform(posting)
@@ -26,6 +33,11 @@ class JobPostingImportBase(object):
                 self.partner_id,
                 self._id(posting)
             )
+            if stats_counter:
+                stats_counter.track(
+                    input_document=posting,
+                    output_document=transformed
+                )
             yield transformed
 
     def _id(self, document):
