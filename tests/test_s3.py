@@ -2,7 +2,7 @@ from moto import mock_s3
 import boto
 import os
 import tempfile
-from skills_utils.s3 import download, upload, upload_dict
+from skills_utils.s3 import download, upload, upload_dict, list_files
 
 
 @mock_s3
@@ -63,3 +63,21 @@ def test_upload_dict():
 
     assert key.get_contents_as_string().decode('utf-8')\
         == '{"stuff": "new contents"}'
+
+
+@mock_s3
+def test_list_files():
+    s3_conn = boto.connect_s3()
+    bucket_name = 'test-bucket'
+    bucket = s3_conn.create_bucket(bucket_name)
+    key = boto.s3.key.Key(
+        bucket=bucket,
+        name='apath/test.json'
+    )
+    key.set_contents_from_string('some contents')
+    s3_path ='test-bucket/apath/'
+    files = list_files(s3_conn, s3_path)
+    print(files)
+    assert files == ['test.json']
+
+
