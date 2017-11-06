@@ -1,0 +1,9 @@
+machine:
+  python:
+    version: 3.5.2
+test:
+  override:
+    - py.test tests
+dependencies:
+  override:
+    - pip install -r requirement.txt
