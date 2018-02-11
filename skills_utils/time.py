@@ -1,5 +1,5 @@
 """Time utilities"""
-from datetime import date
+from datetime import date, timedelta
 import math
 
 
@@ -48,3 +48,21 @@ def datetime_to_quarter(dt):
 
 def overlaps(start_one, end_one, start_two, end_two):
     return start_one <= end_two and start_two <= end_one
+
+
+def dates_in_range(start_date, end_date):
+    """Returns all dates between two dates.
+
+    Inclusive of the start date but not the end date.
+
+    Args:
+        start_date (datetime.date)
+        end_date (datetime.date)
+
+    Returns:
+        (list) of datetime.date objects
+    """
+    return [
+        start_date + timedelta(n)
+        for n in range(int((end_date - start_date).days))
+    ]

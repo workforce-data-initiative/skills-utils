@@ -5,6 +5,9 @@ import boto
 import json
 import logging
 import os
+from collections.abc import MutableMapping
+
+import s3fs
 
 
 def split_s3_path(path):
@@ -94,3 +97,75 @@ def list_files(s3_conn, s3_path):
     for key in bucket.list(prefix=prefix):
         files.append(key.name.split('/')[-1])
     return list(filter(None, files))
+
+
+class S3BackedJsonDict(MutableMapping):
+    """A JSON-serializable dictionary that is backed by S3.
+
+    Not guaranteed to be thread or multiprocess-safe - An attempt is made before saving to merge
+    local changes with others that may have happened to the S3 file since this object was loaded,
+    but this is not atomic.
+    It is recommended that only one version of a given file be modified at a time.
+
+    Will periodically save, but users must call .save() before closing to save all changes.
+
+    Keyword Args:
+        path (string): A full s3 path, including bucket (but without the .json suffix),
+            used for saving the dictionary.
+    """
+    SAVE_EVERY_N_UPDATES = 1000
+
+    def __init__(self, *args, **kw):
+        self.path = kw.pop('path') + '.json'
+        self.fs = s3fs.S3FileSystem()
+
+        if self.fs.exists(self.path):
+            with self.fs.open(self.path, 'rb') as f:
+                data = f.read().decode('utf-8') or '{}'
+                self._storage = json.loads(data)
+        else:
+            self._storage = dict()
+
+        self.num_updates = 0
+        logging.info('Loaded storage with %s keys', len(self))
+
+    def __getitem__(self, key):
+        return self._storage[key]
+
+    def __iter__(self):
+        return iter(self._storage)
+
+    def __len__(self):
+        return len(self._storage)
+
+    def __delitem__(self, key):
+        del self._storage[key]
+
+    def __setitem__(self, key, value):
+        self._storage[key] = value
+        self.num_updates += 1
+        if self.num_updates % self.SAVE_EVERY_N_UPDATES == 0:
+            logging.info('Auto-saving after %s updates', self.num_updates)
+            self.save()
+
+    def __keytransform__(self, key):
+        return key
+
+    def __contains__(self, key):
+        return key in self._storage
+
+    def save(self):
+        logging.info('Attempting to save storage of length %s to %s', len(self), self.path)
+        if self.fs.exists(self.path):
+            with self.fs.open(self.path, 'rb') as f:
+                saved_string = f.read().decode('utf-8') or '{}'
+                saved_data = json.loads(saved_string)
+                logging.info(
+                    'Merging %s in-memory keys with %s stored keys. In-memory data takes priority',
+                    len(self),
+                    len(saved_data)
+                )
+                saved_data.update(self._storage)
+                self._storage = saved_data
+        with self.fs.open(self.path, 'wb') as f:
+            f.write(json.dumps(self._storage).encode('utf-8'))
