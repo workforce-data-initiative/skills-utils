@@ -2,5 +2,5 @@ codecov
 pytest-cov
 pytest
 boto==2.46.1
-moto==0.4.31
+moto==1.2.0
 bumpversion

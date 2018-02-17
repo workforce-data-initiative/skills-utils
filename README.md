@@ -29,7 +29,7 @@ The library is pip-installable, though not through PyPi. You can install it from
 
 `metta` - [metta-data](http://github.com/dssg/metta-data) utilities. Metta-data is a project that defines a standardized matrix/metadata storage utility. It makes it possible to different projects to store design matrices in a way that outsiders can easily use to test model training on real datasets, and know enough about the dataset in order to make sense of it. This module has a prototype for storing an ONET SOC Code classifier using metta.
 
-`s3` - S3 utilities. Some thin wrappers around some boto functionality to reduce boilerplate.
+`s3` - S3 utilities. Some thin wrappers around some boto functionality to reduce boilerplate. Also a dictionary subclass that uses S3 as backing storage.
 
 `testing` - Testing utilities. Including a unittest.TestCase subclass to be used to for testing JobPostingImportBase subclasses to ensure some level of confirmity with our common job posting schema.
 
