@@ -13,7 +13,7 @@ with open('requirements_dev.txt') as requirements_file:
 
 setup(
     name='Skills Utils',
-    version='0.3.1',
+    version='0.4.0',
     description='Shared utilities for skills/jobs taxonomy creation',
     author="Center for Data Science and Public Policy",
     author_email='datascifellows@gmail.com',
